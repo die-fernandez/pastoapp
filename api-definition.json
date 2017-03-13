@@ -1,0 +1,504 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Twitter Search API",
+        "description": "REST API para buscar y guardar informacion de Twitter",
+        "contact": {
+            "name": "Jorge Pastorino & Mario Urtado",
+            "email": "jorge.pastorino@globallogic.com"
+        },
+        "license": {
+            "name": "GlobalLogic",
+            "url": "https://www.globallogic.com/latam"
+        }
+    },
+    "host": "www.globallogic.com",
+    "schemes": [
+        "http"
+    ],
+    "basePath": "/SOA/Projects/TwitterSearch",
+    "paths": {
+        "/user/login": {
+            "post": {
+                "summary": "Ingreso al Sistema",
+                "description": "Ingresar al sistema con usuario ya creado. En caso de exito la aplicacion devolvera un header con un token asosiado a la conexion del usuario.\n",
+                "operationId": "login",
+                "tags": [
+                    "session"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/login_Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Login",
+                        "schema": {
+                            "$ref": "#/definitions/Header"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing or incorrect credentials"
+                    }
+                }
+            }
+        },
+        "/user/singin": {
+            "post": {
+                "summary": "Crear Usuario",
+                "description": "Permite la creacion de un usuario, a partir de los parametros definidos en el Body de la operacion, en caso de tener exito el sistema devolvera un header con un token asosiado a la conexion del usuario, lo que indicara que el mismo ya esta logeado.\n",
+                "operationId": "singin",
+                "tags": [
+                    "session"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "sigin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/basicUser_Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successful Creation",
+                        "schema": {
+                            "$ref": "#/definitions/Header"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - User Already Exist"
+                    }
+                }
+            }
+        },
+        "/user/loguot": {
+            "post": {
+                "summary": "Cerrar sesion",
+                "description": "Permite enviar la peticion de terminar la sesion actualmente activa.\n",
+                "operationId": "loguot",
+                "tags": [
+                    "session"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "token to be passed as a header",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "loguot",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/loguot_Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful loguot"
+                    },
+                    "403": {
+                        "description": "Conflict - Missing or incorrect credentials"
+                    }
+                }
+            }
+        },
+        "/user/{userName}": {
+            "get": {
+                "tags": [
+                    "session"
+                ],
+                "summary": "Obtener Usuario.",
+                "description": "Obtener los datos del usuario a partir del UserName\n",
+                "operationId": "getUserByName",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userName",
+                        "in": "path",
+                        "description": "nombre del usuario.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "token to be passed as a header",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/user_Type"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing or incorrect credentials"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Actualizar Usuario",
+                "description": "Actualizar  la informacion referida al usuario actualinfo de un usuario.\n",
+                "operationId": "update",
+                "tags": [
+                    "session"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userName",
+                        "description": "UserName del usuario actual\n",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "token to be passed as a header",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "updateBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/update_Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden - Missing or incorrect credentials"
+                    },
+                    "501": {
+                        "description": "Not Implemented"
+                    }
+                }
+            }
+        },
+        "/user/{userName}/search": {
+            "get": {
+                "tags": [
+                    "search"
+                ],
+                "summary": "Obtener Busqueda.",
+                "description": "Obtener twits relacionados a filtros aplicados a partir de los parametros de entrada\n",
+                "operationId": "getSearch",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userName",
+                        "in": "path",
+                        "description": "nombre del usuario.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "token to be passed as a header",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "content",
+                        "in": "query",
+                        "description": "Filtra busqueda por contenido particular en twitters. Puede ser hashtag, palabras o frases",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "UserName",
+                        "in": "query",
+                        "description": "Filtra busqueda por un usuario de twitter en particular",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Filtra a partir de la fecha indicada",
+                        "required": false,
+                        "type": "string",
+                        "format": "date"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful search",
+                        "schema": {
+                            "$ref": "#/definitions/search_Type"
+                        }
+                    },
+                    "204": {
+                        "description": "Successful search"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing or incorrect credentials"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "search"
+                ],
+                "summary": "guardar Busqueda.",
+                "description": "Guarda el resultado de una busqueda asociada al usuario en particular\n",
+                "operationId": "saveSearch",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userName",
+                        "in": "path",
+                        "description": "nombre del usuario.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "token to be passed as a header",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "content",
+                        "in": "body",
+                        "description": "Resultado de busquedas a guardar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/search_Type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful search"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing or incorrect credentials"
+                    }
+                }
+            }
+        },
+        "/user/{userName}/searchs": {
+            "get": {
+                "tags": [
+                    "search"
+                ],
+                "summary": "Obtener Busquedas.",
+                "description": "Obtener los datos del usuario a partir del UserName\n",
+                "operationId": "getSearchsByUserName",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "userName",
+                        "in": "path",
+                        "description": "nombre del usuario.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "description": "token to be passed as a header",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/listOfSearch_Type"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Missing or incorrect credentials"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Header_Type": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string",
+                    "format": "dateTime"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "Header": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Header_Type"
+                }
+            ]
+        },
+        "login_Type": {
+            "type": "object",
+            "properties": {
+                "userName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "basicUser_Type": {
+            "type": "object",
+            "properties": {
+                "mail": {
+                    "type": "string",
+                    "format": "email"
+                },
+                "rol": {
+                    "type": "string",
+                    "description": "roles aceptados por la app",
+                    "default": "basicUser",
+                    "enum": [
+                        "basicUser",
+                        "admin"
+                    ]
+                },
+                "userName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "user_Type": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/basicUser_Type"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "creationDate": {
+                            "type": "string",
+                            "format": "dateTime"
+                        }
+                    }
+                }
+            ]
+        },
+        "update_Type": {
+            "type": "object",
+            "allOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "mail": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "rol": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
+        "loguot_Type": {
+            "type": "object",
+            "properties": {
+                "links": {
+                    "items": {
+                        "$ref": "#/definitions/Header"
+                    }
+                }
+            }
+        },
+        "twit_Type": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "dateTime"
+                },
+                "content": {
+                    "type": "string"
+                }
+            }
+        },
+        "search_Type": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/twit_Type"
+            }
+        },
+        "listOfSearch_Type": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/search_Type"
+            }
+        }
+    }
+}
